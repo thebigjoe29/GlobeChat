@@ -42,10 +42,42 @@ Future<bool> codeAlreadyExists(String code) async {
 bool isLoadingcreate = false;
 bool isLoadingjoin = false;
 var isCreated;
+var isJoined;
 TextEditingController roomName = TextEditingController();
+final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
+final List<TextEditingController> controllers = List.generate(6, (_) => TextEditingController());
+TextEditingController topTextFieldController = TextEditingController();
+FocusNode topTextFieldFocusNode = FocusNode();
 
 class _optionsState extends State<options> {
   @override
+  void initState() {
+    super.initState();
+
+    for (int i = 0; i < controllers.length; i++) {
+      controllers[i].addListener(() {
+        if (controllers[i].text.length == 1) {
+          if (i < controllers.length - 1) {
+            FocusScope.of(context).requestFocus(focusNodes[i + 1]);
+          } else {
+            String concatenatedValue = '';
+            for (int j = 0; j < controllers.length; j++) {
+              concatenatedValue += controllers[j].text;
+            }
+            print('Concatenated Value: $concatenatedValue');
+          }
+        }
+      });
+    }
+  }
+
+  @override
+  // void dispose() {
+  //   // topTextFieldController.dispose();
+  //   // topTextFieldFocusNode.dispose();
+  //   // super.dispose();
+  // }
+
   Widget build(BuildContext context) {
     double screenwidth = MediaQuery.of(context).size.width;
     return SafeArea(
@@ -71,17 +103,18 @@ class _optionsState extends State<options> {
                   height: 320,
                   width: screenwidth * 0.9,
                   decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2), // Shadow color
-                          spreadRadius: 1, // Spread radius
-                          blurRadius: 10, // Blur radius
-                          offset: Offset(0, 0), // Offset (x, y)
-                        ),
-                      ],
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(50),
-                      color: Colors.white),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                        offset: Offset(0, 0),
+                      ),
+                    ],
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(50),
+                    color: Colors.white,
+                  ),
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -91,8 +124,10 @@ class _optionsState extends State<options> {
                           Text(
                             "CREATE A NEW CHAT ROOM",
                             style: TextStyle(
-                                fontFamily: "myFont",
-                                fontWeight: FontWeight.bold),
+                              fontFamily: "myFont",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 19,
+                            ),
                           ),
                           Divider(
                             height: 10,
@@ -105,55 +140,62 @@ class _optionsState extends State<options> {
                             height: 80,
                             width: 330,
                             child: TextField(
-                              controller: roomName,
+                              controller: topTextFieldController,
                               decoration: InputDecoration(
-                                
-                                border: OutlineInputBorder(),
-                                
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                                 labelText: "Enter a room name:",
                                 labelStyle: TextStyle(
-                                    fontFamily: "myFont", fontSize: 20),
+                                  fontFamily: "myFont",
+                                  fontSize: 15,
+                                ),
                                 hintText: "eg. StudyRoom",
                                 hintStyle: TextStyle(
-                                    fontFamily: "myFont", fontSize: 10),
+                                  fontFamily: "myFont",
+                                  fontSize: 10,
+                                ),
                               ),
                             ),
                           ),
                           Align(
                             alignment: Alignment.center,
                             child: Container(
-                                height: 30,
-                                width: 330,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.red),
-                                child: Padding(
-                                  padding: EdgeInsets.all(6),
-                                  child: Text(
-                                    "Tip: Share the code generated for others to join your chat!",
-                                    style: TextStyle(
-                                        fontFamily: "myFont",
-                                        fontSize: 10,
-                                        color: Colors.white),
+                              height: 30,
+                              width: 330,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Colors.red,
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(6),
+                                child: Text(
+                                  "Tip: Share the code generated for others to join your chat!",
+                                  style: TextStyle(
+                                    fontFamily: "myFont",
+                                    fontSize: 10,
+                                    color: Colors.white,
                                   ),
-                                )),
+                                ),
+                              ),
+                            ),
                           ),
                           SizedBox(
-                            height: 70,
+                            height: 63,
                           ),
                           SizedBox(
-                            width: screenwidth*0.85,
+                            width: screenwidth * 0.85,
                             height: 80,
                             child: ElevatedButton(
                               onPressed: () async {
+                                roomName.clear();
                                 setState(() {
                                   isLoadingcreate = !isLoadingcreate;
                                 });
-                                //  await Future.delayed(Duration(seconds: 1));
                                 String uniqueCode = await generateUniqueCode();
                                 isCreated = await addChatRoom(
-                                    uniqueCode, roomName.text);
-                                print(roomName.text);
+                                    uniqueCode, topTextFieldController.text);
+                                print(topTextFieldController.text);
                                 setState(() {
                                   isLoadingcreate = !isLoadingcreate;
                                 });
@@ -163,24 +205,31 @@ class _optionsState extends State<options> {
                                         width: 300,
                                         padding: EdgeInsets.all(10),
                                         content: Center(
-                                            child: Text(
-                                          "Chat room created successfully!",
-                                          style:
-                                              TextStyle(fontFamily: "myFont"),
-                                        )),
+                                          child: Text(
+                                            "Chat room created successfully!",
+                                            style: TextStyle(
+                                              fontFamily: "myFont",
+                                            ),
+                                          ),
+                                        ),
                                         shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30)),
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
                                         backgroundColor: Colors.black,
-                                        behavior: SnackBarBehavior.floating,
-                                        duration: Duration(milliseconds: 1500),
+                                        behavior:
+                                            SnackBarBehavior.floating,
+                                        duration:
+                                            Duration(milliseconds: 1500),
                                       ))
                                     : print("error creating room");
 
                                 if (isCreated) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (_) => chatpage(),
-                                  ));
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => chatpage(),
+                                    ),
+                                  );
                                 } else {
                                   //implement wrong chatroomcreation
                                 }
@@ -194,13 +243,17 @@ class _optionsState extends State<options> {
                                   : Text(
                                       "CREATE ROOM",
                                       style: TextStyle(
-                                          fontFamily: "myFont", fontSize: 16),
+                                        fontFamily: "myFont",
+                                        fontSize: 16,
+                                      ),
                                     ),
                               style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(70)),
-                                  backgroundColor:
-                                      Color.fromARGB(255, 116, 208, 119)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(70),
+                                ),
+                                backgroundColor:
+                                    Color.fromARGB(255, 116, 208, 119),
+                              ),
                             ),
                           ),
                         ],
@@ -209,31 +262,35 @@ class _optionsState extends State<options> {
                   ),
                 ),
                 SizedBox(
-                    height: 50,
-                    child: Center(
-                      child: Text(
-                        "OR",
-                        style: TextStyle(
-                            fontFamily: "myFont",
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold),
+                  height: 50,
+                  child: Center(
+                    child: Text(
+                      "OR",
+                      style: TextStyle(
+                        fontFamily: "myFont",
+                        color: const Color.fromARGB(255, 44, 43, 43),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
                       ),
-                    )),
+                    ),
+                  ),
+                ),
                 Container(
                   height: 320,
                   width: screenwidth * 0.9,
                   decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2), // Shadow color
-                          spreadRadius: 1, // Spread radius
-                          blurRadius: 10, // Blur radius
-                          offset: Offset(0, 0), // Offset (x, y)
-                        ),
-                      ],
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(50),
-                      color: Colors.white),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                        offset: Offset(0, 0),
+                      ),
+                    ],
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(50),
+                    color: Colors.white,
+                  ),
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -243,12 +300,128 @@ class _optionsState extends State<options> {
                           Text(
                             "JOIN AN EXISTING CHAT ROOM",
                             style: TextStyle(
-                                fontFamily: "myFont",
-                                fontWeight: FontWeight.bold),
+                              fontFamily: "myFont",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 19,
+                            ),
                           ),
                           Divider(
                             height: 10,
                             thickness: 1,
+                          ),
+                          SizedBox(
+                            height: 40,
+                          ),
+                          Text(
+                            "Enter a valid room code: ",
+                            style: TextStyle(
+                              fontFamily: "myFont",
+                              
+                            ),
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            children: List.generate(6, (index) {
+                              return Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: TextField(
+                                    controller: controllers[index],
+                                    focusNode: focusNodes[index],
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 19,
+                                        vertical: 15,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                          SizedBox(
+                            height: 47,
+                          ),
+                            SizedBox(
+                            width: screenwidth * 0.85,
+                            height: 80,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                roomName.clear();
+                                setState(() {
+                                  isLoadingjoin = !isLoadingjoin;
+                                });
+                                String uniqueCode = await generateUniqueCode();
+                                isCreated = await addChatRoom(
+                                    uniqueCode, topTextFieldController.text);
+                                print(topTextFieldController.text);
+                                setState(() {
+                                  isLoadingjoin = !isLoadingjoin;
+                                });
+                                isJoined
+                                    ? ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                        width: 300,
+                                        padding: EdgeInsets.all(10),
+                                        content: Center(
+                                          child: Text(
+                                            "Room joined successfully!",
+                                            style: TextStyle(
+                                              fontFamily: "myFont",
+                                            ),
+                                          ),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        backgroundColor: Colors.black,
+                                        behavior:
+                                            SnackBarBehavior.floating,
+                                        duration:
+                                            Duration(milliseconds: 1500),
+                                      ))
+                                    : print("error creating room");
+
+                                if (isJoined) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => chatpage(),
+                                    ),
+                                  );
+                                } else {
+                                  //implement wrong cjoining
+                                }
+                              },
+                              child: isLoadingjoin
+                                  ? SizedBox(
+                                      child: Lottie.asset('assets/5.json'),
+                                      width: 50,
+                                      height: 50,
+                                    )
+                                  : Text(
+                                      "JOIN ROOM",
+                                      style: TextStyle(
+                                        fontFamily: "myFont",
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(70),
+                                ),
+                                backgroundColor:
+                                    Color.fromARGB(255, 116, 208, 119),
+                              ),
+                            ),
                           ),
                         ],
                       ),
