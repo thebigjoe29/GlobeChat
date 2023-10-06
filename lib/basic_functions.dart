@@ -9,10 +9,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 FirebaseAuth auth = FirebaseAuth.instance;
 
-Future addChatRoom(String code) async {
-  await firestore.collection('chatroom').doc(code).set({
-//add code to naviagte to chatpage and show all messages
+Future addChatRoom(String code,String roomName) async {
+ try{ await firestore.collection('chatroom').doc(code).set({
+    'name': roomName,
   });
+  return true;
+  }
+  catch(e){
+    print(e);
+    return false;
+  }
 }
 
 Future addChatToARoom(String code, String text, String sender) async {

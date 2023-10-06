@@ -1,4 +1,5 @@
 import 'package:chatapp/chat.dart';
+import 'package:chatapp/options.dart';
 import 'package:chatapp/userlogin.dart';
 import 'package:chatapp/usersignup.dart';
 import 'package:flutter/material.dart';

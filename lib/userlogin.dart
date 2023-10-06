@@ -1,4 +1,5 @@
 import 'package:chatapp/basic_functions.dart';
+import 'package:chatapp/options.dart';
 import 'package:chatapp/usersignup.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -165,7 +166,9 @@ class _loginpageState extends State<loginpage> {
                           ))
                         : print("not logged in");
                         if(isLogin){
-                          //navigate to next page
+                          Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => options(),
+          ));
                         }
                         else{
                           //implement error mechanism for login
