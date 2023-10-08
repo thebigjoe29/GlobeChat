@@ -48,6 +48,14 @@ final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
 final List<TextEditingController> controllers = List.generate(6, (_) => TextEditingController());
 TextEditingController topTextFieldController = TextEditingController();
 FocusNode topTextFieldFocusNode = FocusNode();
+var chatRoomCode;
+ String getConcatenatedValue(List<TextEditingController> controllers) {
+    String concatenatedValue = '';
+    for (int i = 0; i < controllers.length; i++) {
+      concatenatedValue += controllers[i].text;
+    }
+    return concatenatedValue;
+  }
 
 class _optionsState extends State<options> {
   @override
@@ -72,11 +80,7 @@ class _optionsState extends State<options> {
   }
 
   @override
-  // void dispose() {
-  //   // topTextFieldController.dispose();
-  //   // topTextFieldFocusNode.dispose();
-  //   // super.dispose();
-  // }
+  
 
   Widget build(BuildContext context) {
     double screenwidth = MediaQuery.of(context).size.width;
@@ -112,7 +116,7 @@ class _optionsState extends State<options> {
                       ),
                     ],
                     shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(50),
+                    borderRadius: BorderRadius.circular(15),
                     color: Colors.white,
                   ),
                   child: Center(
@@ -160,28 +164,30 @@ class _optionsState extends State<options> {
                           ),
                           Align(
                             alignment: Alignment.center,
-                            child: Container(
-                              height: 30,
-                              width: 330,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.red,
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(6),
-                                child: Text(
-                                  "Tip: Share the code generated for others to join your chat!",
-                                  style: TextStyle(
-                                    fontFamily: "myFont",
-                                    fontSize: 10,
-                                    color: Colors.white,
+                            child: Padding(
+                              padding: EdgeInsets.all(6),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    child: Lottie.asset("assets/6.json"),
+                                    height: 17,
+                                    width: 17,
                                   ),
-                                ),
+                                  Text(
+                                    "Tip: Share the code generated for others to join your chat!",
+                                    style: TextStyle(
+                                      fontFamily: "myFont",
+                                      fontSize: 10,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                           SizedBox(
-                            height: 63,
+                            height: 57,
                           ),
                           SizedBox(
                             width: screenwidth * 0.85,
@@ -193,6 +199,7 @@ class _optionsState extends State<options> {
                                   isLoadingcreate = !isLoadingcreate;
                                 });
                                 String uniqueCode = await generateUniqueCode();
+                                chatRoomCode=uniqueCode;
                                 isCreated = await addChatRoom(
                                     uniqueCode, topTextFieldController.text);
                                 print(topTextFieldController.text);
@@ -225,9 +232,10 @@ class _optionsState extends State<options> {
                                     : print("error creating room");
 
                                 if (isCreated) {
+                                  isJoined=false;
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) => chatpage(),
+                                      builder: (_) => chatpage(isCreated:isCreated,chatRoomCode: chatRoomCode,),
                                     ),
                                   );
                                 } else {
@@ -288,7 +296,7 @@ class _optionsState extends State<options> {
                       ),
                     ],
                     shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(50),
+                    borderRadius: BorderRadius.circular(15),
                     color: Colors.white,
                   ),
                   child: Center(
@@ -323,6 +331,7 @@ class _optionsState extends State<options> {
                             height: 15,
                           ),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: List.generate(6, (index) {
                               return Padding(
                                 padding: const EdgeInsets.all(4.0),
@@ -355,14 +364,12 @@ class _optionsState extends State<options> {
                             height: 80,
                             child: ElevatedButton(
                               onPressed: () async {
-                                roomName.clear();
+                                
                                 setState(() {
                                   isLoadingjoin = !isLoadingjoin;
                                 });
-                                String uniqueCode = await generateUniqueCode();
-                                isCreated = await addChatRoom(
-                                    uniqueCode, topTextFieldController.text);
-                                print(topTextFieldController.text);
+                               chatRoomCode=getConcatenatedValue(controllers);
+                              isJoined=await doesRoomExist(chatRoomCode);
                                 setState(() {
                                   isLoadingjoin = !isLoadingjoin;
                                 });
@@ -389,12 +396,13 @@ class _optionsState extends State<options> {
                                         duration:
                                             Duration(milliseconds: 1500),
                                       ))
-                                    : print("error creating room");
+                                    : print("error joining room");
 
                                 if (isJoined) {
+                                  isCreated=false;
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) => chatpage(),
+                                      builder: (_) => chatpage(isCreated: isCreated,chatRoomCode: chatRoomCode,),
                                     ),
                                   );
                                 } else {

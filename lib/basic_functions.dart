@@ -20,11 +20,40 @@ Future addChatRoom(String code,String roomName) async {
     return false;
   }
 }
+Future getUsernameByEmail(String email) async {
+  try {
+    final QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
+        .collection('users') // Replace with your collection name
+        .where('email', isEqualTo: email)
+        .limit(1) // Limit the query to 1 result since emails should be unique
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final userDoc = querySnapshot.docs.first;
+      // 'username' is the field name in the document that stores the username
+      return userDoc['username'];
+    } else {
+      // No user found with the given email
+      return null;
+    }
+  } catch (e) {
+    print('Error getting username by email: $e');
+    return null;
+  }
+}
+
+
+
+
+
+
 
 Future addChatToARoom(String code, String text, String sender) async {
   await firestore.collection('chatroom').doc(code).collection('messages').add({
     'text': text,
     'sender': sender,
+    'email': auth.currentUser?.email,
+    'timestamp': FieldValue.serverTimestamp(),
   });
   return sender;
 }
@@ -52,6 +81,42 @@ Future loginFunc(String email, String password) async {
 }
 
 
+Future doesRoomExist(String roomCode) async {
+  try {
+    final roomDocument = await FirebaseFirestore.instance
+        .collection('chatroom')
+        .doc(roomCode) // Assuming 'roomCode' is the document ID
+        .get();
+
+    // Check if the room document exists
+    if (roomDocument.exists) {
+      return true; // Room exists
+    } else {
+      return false; // Room does not exist
+    }
+  } catch (e) {
+    print('Error checking room existence: $e');
+    return false; // Error occurred, consider it as room not existing
+  }
+}
+Future getChatRoomName(String docId) async {
+  try {
+    var roomDocument = await FirebaseFirestore.instance
+        .collection('chatroom')
+        .doc(docId)
+        .get();
+
+    if (roomDocument.exists) {
+      var name = roomDocument.data()?['name']; // Get the 'name' field
+      return name; // Return the name value (or null if 'name' field doesn't exist)
+    } else {
+      return null; // Document with the specified docId does not exist
+    }
+  } catch (e) {
+    print('Error getting chat room name: $e');
+    return null; // Error occurred, return null
+  }
+}
 
 
 
