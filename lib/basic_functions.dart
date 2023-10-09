@@ -41,6 +41,30 @@ Future getUsernameByEmail(String email) async {
     return null;
   }
 }
+Future doesUserExist(String email) async {
+  try {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: 'temporary_password', // Provide a temporary password
+    );
+    await userCredential.user?.delete(); // Delete the temporary user
+    return false; // User does not exist
+  } catch (e) {
+    if (e is FirebaseAuthException && e.code == 'email-already-in-use') {
+      return true; // User already exists
+    }
+    return false; // Some other error occurred
+  }
+}
+
+bool isEmailValid(String email) {
+  // Define a regular expression pattern for the specific format
+  final emailRegex = RegExp(r'^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]+');
+
+  // Use the hasMatch method to check if the email matches the pattern
+  return emailRegex.hasMatch(email);
+}
 
 
 
@@ -67,8 +91,12 @@ Future signupFunc(String email, String password, String username) async {
   return true;
   }
   catch(e){
+    if(e is FirebaseAuthException){
+      return e.code;
+    }
     print(e);
-return false;
+    
+
   }
 }
 

@@ -18,6 +18,8 @@ class _signuppageState extends State<signuppage> {
   TextEditingController usernameCon=TextEditingController();
   var isSignup;
   bool isLoading=false;
+  var doesUserExistt;
+  var isEmailValidd;
   @override
   Widget build(BuildContext context) {
     double screenwidth = MediaQuery.of(context).size.width;
@@ -183,16 +185,29 @@ class _signuppageState extends State<signuppage> {
                   child: ElevatedButton(
                     
                     onPressed: () async {
+                       if(emailCon.text.isEmpty || passCon.text.isEmpty || usernameCon.text.isEmpty){
+                         ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(
+                                width: 380,
+                                padding: EdgeInsets.all(10),
+                              content: Center(child: Text("Email-Id/Password/Username field cannot be empty",style: TextStyle(fontFamily: "myFont",fontSize: 12),)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: Colors.black,
+                               behavior: SnackBarBehavior.floating,
+                               duration: Duration(milliseconds: 1500),
+                            ));
+                      }
+                      else{
                       setState(() {
                         isLoading=!isLoading;
                       });
-                     await Future.delayed(Duration(seconds: 1));
+                    // await Future.delayed(Duration(seconds: 1));
                       isSignup = await signupFunc(emailCon.text, passCon.text,usernameCon.text);
                        setState(() {
                         isLoading=!isLoading;
                       });
-                      isSignup
-                          ? ScaffoldMessenger.of(context)
+                     if( isSignup is bool && isSignup){
+                           ScaffoldMessenger.of(context)
                               .showSnackBar(SnackBar(
                                 width: 300,
                                 padding: EdgeInsets.all(10),
@@ -201,19 +216,57 @@ class _signuppageState extends State<signuppage> {
                               backgroundColor: Colors.black,
                                behavior: SnackBarBehavior.floating,
                                duration: Duration(milliseconds: 1500),
-                            ))
-                          : print("not signed in");
-
-                        if(isSignup){
+                            ));
+                          
+                       
                            Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => loginpage(),
           ));
 
                         }
                         else{
-                          //implement wrong signup
-                        }
-                    },
+                          if(isSignup is String){
+                         if(isSignup=="email-already-in-use"){
+                            ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(
+                                width: 380,
+                                padding: EdgeInsets.all(10),
+                              content: Center(child: Text("This Email-Id is already in use",style: TextStyle(fontFamily: "myFont"),)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: Colors.black,
+                               behavior: SnackBarBehavior.floating,
+                               duration: Duration(milliseconds: 1500),
+                            ));
+                         }
+                         else if(isSignup=="weak-password"){
+                            ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(
+                                width: 380,
+                                padding: EdgeInsets.all(10),
+                              content: Center(child: Text("Password must be minimum 6 characters",style: TextStyle(fontFamily: "myFont"),)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: Colors.black,
+                               behavior: SnackBarBehavior.floating,
+                               duration: Duration(milliseconds: 1500),
+                            ));
+                         }
+                         else if(isSignup=="invalid-email"){
+                              ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(
+                                width: 380,
+                                padding: EdgeInsets.all(10),
+                              content: Center(child: Text("The Email-Id entered is in wrong format",style: TextStyle(fontFamily: "myFont"),)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: Colors.black,
+                               behavior: SnackBarBehavior.floating,
+                               duration: Duration(milliseconds: 1500),
+                            ));
+                         }
+
+                        }}
+                     
+                       
+                    }},
                     child: isLoading?  SizedBox(
                   child: Lottie.asset('assets/5.json'),
                   width: 50,

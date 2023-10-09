@@ -194,7 +194,19 @@ class _optionsState extends State<options> {
                             height: 80,
                             child: ElevatedButton(
                               onPressed: () async {
-                                roomName.clear();
+                                if(topTextFieldController.text.isEmpty){
+                                   ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(
+                                width: 380,
+                                padding: EdgeInsets.all(10),
+                              content: Center(child: Text("Chat room name cannot be empty",style: TextStyle(fontFamily: "myFont"),)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: Colors.black,
+                               behavior: SnackBarBehavior.floating,
+                               duration: Duration(milliseconds: 1500),
+                            ));
+                                }
+                                else{
                                 setState(() {
                                   isLoadingcreate = !isLoadingcreate;
                                 });
@@ -241,7 +253,7 @@ class _optionsState extends State<options> {
                                 } else {
                                   //implement wrong chatroomcreation
                                 }
-                              },
+                              }},
                               child: isLoadingcreate
                                   ? SizedBox(
                                       child: Lottie.asset('assets/5.json'),
@@ -396,8 +408,28 @@ class _optionsState extends State<options> {
                                         duration:
                                             Duration(milliseconds: 1500),
                                       ))
-                                    : print("error joining room");
-
+                                    : ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                        width: 300,
+                                        padding: EdgeInsets.all(10),
+                                        content: Center(
+                                          child: Text(
+                                            "Please enter a valid room code",
+                                            style: TextStyle(
+                                              fontFamily: "myFont",
+                                            ),
+                                          ),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        backgroundColor: Colors.black,
+                                        behavior:
+                                            SnackBarBehavior.floating,
+                                        duration:
+                                            Duration(milliseconds: 1500),
+                                      ));
                                 if (isJoined) {
                                   isCreated=false;
                                   Navigator.of(context).push(

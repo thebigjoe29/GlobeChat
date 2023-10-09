@@ -146,10 +146,23 @@ class _loginpageState extends State<loginpage> {
                   height: 60,
                   child: ElevatedButton(
                     onPressed: () async {
+                      if(emailCon.text.isEmpty || passCon.text.isEmpty){
+                         ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(
+                                width: 380,
+                                padding: EdgeInsets.all(10),
+                              content: Center(child: Text("Email-Id/Password field cannot be empty",style: TextStyle(fontFamily: "myFont"),)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: Colors.black,
+                               behavior: SnackBarBehavior.floating,
+                               duration: Duration(milliseconds: 1500),
+                            ));
+                      }
+                      else{
                       setState(() {
                         isLoading=!isLoading;
                       });
-                      await Future.delayed(Duration(seconds: 1));
+                      //await Future.delayed(Duration(seconds: 1));
                       isLogin = await loginFunc(emailCon.text, passCon.text);
                        setState(() {
                         isLoading=!isLoading;
@@ -165,16 +178,23 @@ class _loginpageState extends State<loginpage> {
                                behavior: SnackBarBehavior.floating,
                                duration: Duration(milliseconds: 1500),
                             ))
-                          : print("not logged in");
+                          : ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(
+                                width: 250,
+                                padding: EdgeInsets.all(10),
+                              content: Center(child: Text("Invalid Email-Id/Password",style: TextStyle(fontFamily: "myFont"),)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: Colors.black,
+                               behavior: SnackBarBehavior.floating,
+                               duration: Duration(milliseconds: 1500),
+                            ));
                           if(isLogin){
                             Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => options(),
             ));
                           }
-                          else{
-                            //implement error mechanism for login
-                          }
-                    },
+                         
+                    }},
                     child: isLoading?  SizedBox(
                   child: Lottie.asset('assets/5.json'),
                   width: 50,
