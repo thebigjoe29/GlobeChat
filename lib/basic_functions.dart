@@ -20,6 +20,27 @@ Future addChatRoom(String code,String roomName) async {
     return false;
   }
 }
+Future confirmResetPassword(String code,String password)async{
+  try{
+    await auth.confirmPasswordReset(code: code, newPassword: password);
+    return true;
+  }
+  catch(e){
+    print(e);
+    return false;
+  }
+}
+
+Future sendPasswordResetEmail(String email)async{
+  try{
+    await auth.sendPasswordResetEmail(email: email);
+    return true;
+  }
+  catch(e){
+print("ERROR IS: "+e.toString());
+return false;
+  }
+}
 Future getUsernameByEmail(String email) async {
   try {
     final QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance

@@ -1,4 +1,5 @@
 import 'package:chatapp/basic_functions.dart';
+import 'package:chatapp/forgotpassword.dart';
 import 'package:chatapp/options.dart';
 import 'package:chatapp/usersignup.dart';
 import 'package:flutter/gestures.dart';
@@ -124,7 +125,11 @@ class _loginpageState extends State<loginpage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => forgotPassword(),
+            ));
+                        },
                         child: Text(
                           "Forgot Password?",
                           style: TextStyle(
