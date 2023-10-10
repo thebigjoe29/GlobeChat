@@ -30,7 +30,16 @@ Future confirmResetPassword(String code,String password)async{
     return false;
   }
 }
-
+Future logoutUser()async{
+  try{
+    await auth.signOut();
+    return true;
+  }
+  catch(e){
+print(e);
+return false;
+  }
+}
 Future sendPasswordResetEmail(String email)async{
   try{
     await auth.sendPasswordResetEmail(email: email);

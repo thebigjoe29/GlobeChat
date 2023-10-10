@@ -92,13 +92,42 @@ class _optionsState extends State<options> {
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Hero(
-                  tag: "yo",
-                  child: SizedBox(
-                    child: Lottie.asset('assets/2.json'),
-                    width: 100,
-                    height: 100,
-                  ),
+                Row(
+                  //mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(width: 50,),
+                  //  Spacer(flex: 1,),
+                    Expanded(
+                      flex: 1,
+                      child: Center(
+                        child: Hero(
+                          tag: "yo",
+                          child: SizedBox(
+                            child: Lottie.asset('assets/2.json'),
+                            width: 100,
+                            height: 100,
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(onPressed: (){
+                      logoutUser();
+                      Navigator.pop(context);
+                        ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(
+                                width: 380,
+                                padding: EdgeInsets.all(10),
+                              content: Center(child: Text("Logged out successfully!",style: TextStyle(fontFamily: "myFont"),)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: Colors.black,
+                               behavior: SnackBarBehavior.floating,
+                               duration: Duration(milliseconds: 1500),
+                            ));
+                    
+                    }, icon:Icon(Icons.logout,color: Colors.red,size: 30,)),
+                
+                  ],
                 ),
                 SizedBox(
                   height: 15,

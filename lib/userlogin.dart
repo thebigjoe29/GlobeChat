@@ -18,6 +18,7 @@ class _loginpageState extends State<loginpage> {
   TextEditingController emailCon = TextEditingController();
   TextEditingController passCon = TextEditingController();
   var isLogin;
+  bool showPass=true;
   bool isLoading=false;
   @override
   Widget build(BuildContext context) {
@@ -104,7 +105,13 @@ class _loginpageState extends State<loginpage> {
                             16), // Adjust the horizontal padding as needed
                     child: TextField(
                       controller: passCon,
+                      obscureText: showPass,
                       decoration: InputDecoration(
+                        suffixIcon: IconButton(onPressed: (){
+                          setState(() {
+                            showPass=!showPass;
+                          });
+                        }, icon:showPass? Icon(Icons.visibility_off,color: Colors.black,): Icon(Icons.visibility,color: Colors.black)),
                           prefixIcon: Icon(Icons.lock, color: Colors.grey),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),

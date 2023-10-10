@@ -46,7 +46,14 @@ var roomName;
         backgroundColor: Color.fromARGB(255, 242, 216, 216),
         appBar: AppBar(
           backgroundColor: Colors.red.withOpacity(0.5),
-          automaticallyImplyLeading: false,
+         // automaticallyImplyLeading: false,
+          actions: [
+            IconButton(onPressed: (){
+             // logoutUser();
+             // Navigator.pop(context
+            }, icon:Icon(Icons.language,size: 30,) ),
+          ],
+         // leading: IconButton(onPressed: (){}, icon: Icon(Icons.logout)),
           toolbarHeight: 80,
           title: Center(
             child: Column(

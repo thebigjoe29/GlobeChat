@@ -20,6 +20,7 @@ class _signuppageState extends State<signuppage> {
   bool isLoading=false;
   var doesUserExistt;
   var isEmailValidd;
+  bool showPass=true;
   @override
   Widget build(BuildContext context) {
     double screenwidth = MediaQuery.of(context).size.width;
@@ -126,7 +127,13 @@ class _signuppageState extends State<signuppage> {
                           16), // Adjust the horizontal padding as needed
                   child: TextField(
                     controller: passCon,
+                    obscureText: showPass,
                     decoration: InputDecoration(
+                      suffixIcon: IconButton(onPressed: (){
+                        setState(() {
+                          showPass=!showPass;
+                        });
+                      }, icon: showPass? Icon(Icons.visibility_off,color: Colors.black,): Icon(Icons.visibility,color: Colors.black,)),
                         prefixIcon: Icon(Icons.lock, color: Colors.grey),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
